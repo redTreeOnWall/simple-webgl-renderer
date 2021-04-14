@@ -10,7 +10,7 @@ interface BufferData {
   [key: string]: {
     size: number,
     attributeLocation: number,
-    vertxBuffer: WebGLBuffer | null,
+    vertexBuffer: WebGLBuffer | null,
   }
 
 }
@@ -20,7 +20,7 @@ export class BufferGeometry {
 
   bufferData: BufferData = {};
 
-  vertxNum = -1
+  vertexNum = -1
 
   createVBO(gl: WebGLRenderingContext) {
     for (let key in this.originData) {
@@ -30,7 +30,7 @@ export class BufferGeometry {
 
       this.bufferData[key] = {
         size: oneOriginData.size,
-        vertxBuffer: VBO,
+        vertexBuffer: VBO,
         attributeLocation: -1,
       };
     }
@@ -41,17 +41,17 @@ export class BufferGeometry {
       const oneBufferData = this.bufferData[key];
       const oneOriginData = this.originData[key];
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, oneBufferData.vertxBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, oneBufferData.vertexBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(oneOriginData.data), gl.STATIC_DRAW);
 
       oneBufferData.size = oneOriginData.size;
 
-      const oneVertxNum = Math.floor(oneOriginData.data.length / oneOriginData.size);
+      const oneVertexNum = Math.floor(oneOriginData.data.length / oneOriginData.size);
 
-      if (this.vertxNum === -1) {
-        this.vertxNum = oneVertxNum;
+      if (this.vertexNum === -1) {
+        this.vertexNum = oneVertexNum;
       } else {
-        if (this.vertxNum !== oneVertxNum) {
+        if (this.vertexNum !== oneVertexNum) {
           console.error(`origin data is not correct:`)
           console.error(this.originData);
         }
@@ -79,7 +79,7 @@ export class BufferGeometry {
   useBuffer(gl: WebGLRenderingContext) {
     for (let key in this.bufferData) {
       const buffer = this.bufferData[key];
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertxBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertexBuffer);
       gl.vertexAttribPointer(buffer.attributeLocation, buffer.size, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(buffer.attributeLocation);
     }

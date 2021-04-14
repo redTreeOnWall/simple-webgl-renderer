@@ -1,5 +1,5 @@
 
-export const createShadar = (gl: WebGLRenderingContext, type: number, source: string) => {
+export const createShader = (gl: WebGLRenderingContext, type: number, source: string) => {
   const shader = gl.createShader(type) as WebGLShader;
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
@@ -16,7 +16,7 @@ export const createShadar = (gl: WebGLRenderingContext, type: number, source: st
 
 export const createProgram = (
   gl: WebGLRenderingContext,
-  vertxShader: WebGLShader,
+  vertexShader: WebGLShader,
   fragmentShader: WebGLShader
 ) => {
   const program = gl.createProgram();
@@ -24,7 +24,7 @@ export const createProgram = (
     return;
   }
 
-  gl.attachShader(program, vertxShader);
+  gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
 
@@ -37,13 +37,13 @@ export const createProgram = (
   return null;
 }
 
-export const createProgramFromeSource = (
+export const createProgramFromSource = (
   gl: WebGLRenderingContext,
-  vertxShaderSource: string,
+  vertexShaderSource: string,
   fragmentShaderSource: string, 
 ) => {
-  const vertxShader = createShadar(gl, gl.VERTEX_SHADER, vertxShaderSource) as WebGLShader;
-  const fragmentShader = createShadar(gl, gl.FRAGMENT_SHADER, fragmentShaderSource) as WebGLShader;
-  return createProgram(gl, vertxShader, fragmentShader);
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource) as WebGLShader;
+  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource) as WebGLShader;
+  return createProgram(gl, vertexShader, fragmentShader);
 }
 

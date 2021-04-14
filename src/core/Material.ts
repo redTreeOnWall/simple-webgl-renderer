@@ -30,7 +30,7 @@ export class Material{
     }
   }
 
-  updateUnfiform(gl: WebGLRenderingContext){
+  updateUniform(gl: WebGLRenderingContext){
     for( let key in this.uniforms) {
       const uniform = this.uniforms[key];
 

@@ -1,4 +1,4 @@
-import { createProgramFromeSource } from "../src/core/ShaderProgamUtils";
+import { createProgramFromSource } from "../src/core/ShaderProgamUtils";
 import { BufferGeometry } from "../src/core/BufferGeometry";
 import { awaitTime } from "../src/utils/timeUtils";
 import { Material, UniformType } from "../src/core/Material";
@@ -9,7 +9,7 @@ const gl = canvas.getContext('webgl') as WebGLRenderingContext;
 
 const createObject = (xOffset: number) => {
 
-  const program = createProgramFromeSource(
+  const program = createProgramFromSource(
     gl,
     `
 attribute vec4 a_position;
@@ -107,9 +107,9 @@ const paint  = async () => {
 
       gl.useProgram(o.material.program);
       o.material.uniforms.u_time.value[0] = timeSecond;
-      o.material.updateUnfiform(gl);
+      o.material.updateUniform(gl);
       o.geometry.useBuffer(gl);
-      gl.drawArrays(gl.TRIANGLES, 0, o.geometry.vertxNum);
+      gl.drawArrays(gl.TRIANGLES, 0, o.geometry.vertexNum);
     }
 
   }
