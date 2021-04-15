@@ -7,5 +7,6 @@ a simple webGL renderer.
 npm run buildExample
 ```
 2. open example/html/example.html
+![](./res/example.jpg)
 
 
