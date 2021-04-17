@@ -145,6 +145,7 @@ void main() {
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
 
+      //TODO do nothing if program or buffer is not changed
       gl.useProgram(o.material.program);
       o.material.uniforms.u_time.value[0] = timeSecond;
       // o.material.uniforms.u_scale.value[0] = Math.sin(timeSecond + i * Math.PI / objects.length);

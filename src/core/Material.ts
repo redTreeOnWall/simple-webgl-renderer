@@ -39,6 +39,8 @@ export class Material{
       const uniform = this.uniforms[key];
 
       // TODO change to array map
+
+      // dirty check
       if(uniform.type === UniformType.vec4) {
         gl.uniform4fv(uniform.location, uniform.value);
       }
