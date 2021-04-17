@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "buildExample": "webpack",
     "build": "tsc",
-    "dev": "webpack -w"
+    "dev": "webpack -w",
+    "server": "python -m http.server"
   },
   "repository": {
     "type": "git",

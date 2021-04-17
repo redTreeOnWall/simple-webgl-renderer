@@ -6,7 +6,13 @@ a simple webGL renderer.
 ```
 npm run buildExample
 ```
-2. open example/html/example.html
+2. start a static http server, (I use python http server)
+```
+python http.server
+```
+3. open example/html/example.html in http server
 ![](./res/example.jpg)
+
+![](./res/example2.JPG)
 
 
