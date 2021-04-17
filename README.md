@@ -13,6 +13,6 @@ python http.server
 3. open example/html/example.html in http server
 ![](./res/example.jpg)
 
-![](./res/example2.JPG)
+![](./res/example2.jpg)
 
 
