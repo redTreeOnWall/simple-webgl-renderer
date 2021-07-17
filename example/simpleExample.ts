@@ -60,7 +60,7 @@ uniform sampler2D u_image2;
 void main() {
   vec4 col1 = texture2D(u_image1, v_uv.xy);
   vec4 col2 = texture2D(u_image2, v_uv.xy);
-  gl_FragColor =col1 * col2;
+  gl_FragColor = col2 * col1;
 }
     `,
     ) as WebGLProgram;
@@ -118,6 +118,7 @@ void main() {
         location: -1,
       }
     }
+
     material.init(gl);
 
     return {

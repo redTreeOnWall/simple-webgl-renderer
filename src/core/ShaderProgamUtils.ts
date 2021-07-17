@@ -47,3 +47,14 @@ export const createProgramFromSource = (
   return createProgram(gl, vertexShader, fragmentShader);
 }
 
+
+export const createProgramWithTransform = (
+  gl: WebGLRenderingContext,
+  vertexShaderSource: string,
+  fragmentShaderSource: string, 
+) => {
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource) as WebGLShader;
+  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource) as WebGLShader;
+  return createProgram(gl, vertexShader, fragmentShader);
+}
+
