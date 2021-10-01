@@ -175,16 +175,6 @@ void main() {
 
     geometry.initBuffer(gl, program);
 
-
-    const cameraMatrix = Mat4.translationMat4(0, 0, 10, new Mat4());
-
-    const viewMatrix = Mat4.inverse(cameraMatrix, cameraMatrix);
-
-    const projection = Mat4.perspective( 60 * Math.PI / 180 , 1, 0.1, 1000, new Mat4());
-
-    const viewProjectionMatrix = Mat4.multiply(projection, viewMatrix, projection);
-
-
     const material = new Material(program);
     material.uniforms = {
       u_time: {
@@ -197,10 +187,9 @@ void main() {
         value: new Mat4().elements,
         location: -1,
       },
-      // TODO handle matrix and projection in pipeline
       u_projection: {
         type: UniformType.mat4,
-        value: viewProjectionMatrix.elements,
+        value: Mat4.orthographic(-30, 30, -30, 30, -10, 10, new Mat4()).elements,
         location: -1,
       }
     }
@@ -218,7 +207,7 @@ void main() {
 
   const objects: Array<Object3D> = [];
 
-  for(let i = 0 ; i < 5 ; i++) {
+  for(let i = 0 ; i < 900 ; i++) {
     objects.push(createObject(Math.random() * 2 - 1, Math.random() * 2 - 1));
   }
 
@@ -259,7 +248,7 @@ void main() {
 
       Mat4.multiply(__tempMat41, __tempMat42, transform.localMat4);
 
-      Mat4.translationMat4(-3 + i * 1.5, 0, 0, __tempMat41);
+      Mat4.translationMat4(-22.5 + 1.5*Math.floor(i % 30), -22.5 + 1.5*Math.floor(i / 30), 0, __tempMat41);
       Mat4.multiply( __tempMat41, transform.localMat4, transform.localMat4);
 
       material.uniforms.u_matrix.value = transform.localMat4.elements;

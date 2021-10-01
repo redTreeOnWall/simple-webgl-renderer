@@ -175,16 +175,6 @@ void main() {
 
     geometry.initBuffer(gl, program);
 
-
-    const cameraMatrix = Mat4.translationMat4(0, 0, 10, new Mat4());
-
-    const viewMatrix = Mat4.inverse(cameraMatrix, cameraMatrix);
-
-    const projection = Mat4.perspective( 60 * Math.PI / 180 , 1, 0.1, 1000, new Mat4());
-
-    const viewProjectionMatrix = Mat4.multiply(projection, viewMatrix, projection);
-
-
     const material = new Material(program);
     material.uniforms = {
       u_time: {
@@ -197,10 +187,9 @@ void main() {
         value: new Mat4().elements,
         location: -1,
       },
-      // TODO handle matrix and projection in pipeline
       u_projection: {
         type: UniformType.mat4,
-        value: viewProjectionMatrix.elements,
+        value: Mat4.orthographic(-5, 5, -5, 5, -10, 10, new Mat4()).elements,
         location: -1,
       }
     }
@@ -217,10 +206,7 @@ void main() {
 
 
   const objects: Array<Object3D> = [];
-
-  for(let i = 0 ; i < 5 ; i++) {
-    objects.push(createObject(Math.random() * 2 - 1, Math.random() * 2 - 1));
-  }
+  objects.push(createObject(Math.random() * 2 - 1, Math.random() * 2 - 1));
 
   let timeSecond = 0;
   const frameTime = Math.floor(1000 / 60);
@@ -250,7 +236,8 @@ void main() {
       gl.useProgram(material.program);
       (material.uniforms.u_time.value as number[])[0] = timeSecond;
       
-      const dAngle = Math.PI * 2 * 0.5 * timeSecond  + i * 0.1;
+      const dx = 0.03 * frameTime / 1000;
+      const dAngle = Math.PI * 2 * 0.1 * timeSecond;
       // Mat4.translationMat4(dx, dx, 0, __tempMat41);
       // Mat4.rotateXMat4(dAngle, __tempMat41);
       // Mat4.rotateYMat4(dAngle, __tempMat41);
@@ -258,9 +245,6 @@ void main() {
       Mat4.rotateYMat4( 0.6 * dAngle, __tempMat42);
 
       Mat4.multiply(__tempMat41, __tempMat42, transform.localMat4);
-
-      Mat4.translationMat4(-3 + i * 1.5, 0, 0, __tempMat41);
-      Mat4.multiply( __tempMat41, transform.localMat4, transform.localMat4);
 
       material.uniforms.u_matrix.value = transform.localMat4.elements;
 
