@@ -84,5 +84,4 @@ export class BufferGeometry {
       gl.enableVertexAttribArray(buffer.attributeLocation);
     }
   }
-
 }

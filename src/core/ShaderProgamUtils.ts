@@ -21,7 +21,7 @@ export const createProgram = (
 ) => {
   const program = gl.createProgram();
   if(program === null) {
-    return;
+    return null;
   }
 
   gl.attachShader(program, vertexShader);
@@ -38,6 +38,16 @@ export const createProgram = (
 }
 
 export const createProgramFromSource = (
+  gl: WebGLRenderingContext,
+  vertexShaderSource: string,
+  fragmentShaderSource: string, 
+) => {
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource) as WebGLShader;
+  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource) as WebGLShader;
+  return createProgram(gl, vertexShader, fragmentShader);
+}
+
+export const createProgramWithTransform = (
   gl: WebGLRenderingContext,
   vertexShaderSource: string,
   fragmentShaderSource: string, 

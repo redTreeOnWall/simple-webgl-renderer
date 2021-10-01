@@ -176,7 +176,11 @@ void main() {
     geometry.initBuffer(gl, program);
 
 
-    const cameraMatrix = Mat4.translationMat4(0, 0, 10, new Mat4());
+    const cameraMatrix = Mat4.multiply(
+      Mat4.translationMat4(10, 0, 10, new Mat4()),
+      Mat4.rotateYMat4(Math.PI / 3,  new Mat4()),
+      new Mat4(),
+    );
 
     const viewMatrix = Mat4.inverse(cameraMatrix, cameraMatrix);
 
@@ -218,7 +222,7 @@ void main() {
 
   const objects: Array<Object3D> = [];
 
-  for(let i = 0 ; i < 5 ; i++) {
+  for(let i = 0 ; i < 900 ; i++) {
     objects.push(createObject(Math.random() * 2 - 1, Math.random() * 2 - 1));
   }
 
@@ -259,7 +263,7 @@ void main() {
 
       Mat4.multiply(__tempMat41, __tempMat42, transform.localMat4);
 
-      Mat4.translationMat4(-3 + i * 1.5, 0, 0, __tempMat41);
+      Mat4.translationMat4(-22.5 + 1.5*Math.floor(i % 30), -22.5 + 1.5*Math.floor(i / 30), 0, __tempMat41);
       Mat4.multiply( __tempMat41, transform.localMat4, transform.localMat4);
 
       material.uniforms.u_matrix.value = transform.localMat4.elements;
