@@ -3,11 +3,13 @@ import { BufferGeometry } from "../src/core/BufferGeometry";
 // import { awaitTime } from "../src/utils/timeUtils";
 import { Material, UniformType } from "../src/core/Material";
 import { Texture } from "../src/core/Texture";
+import { Object3D } from "../src/core/Object";
 
 import { loadImage } from "../src/utils/ImageLoader";
+import {Renderer} from "../src/core/Renderer";
 
 
-const paint = async () => {
+const startPaint = async () => {
 
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -39,13 +41,12 @@ void main() {
   v_uv = vec4(a_uv.x, 1.0 - a_uv.y, 0.0, 1.0);
   v_time = u_time;
 
-
   float y =0.3 * sin(u_time.x);
   float x = 0.3 * cos(u_time.x);
 
   vec4 p = vec4(a_position.x + sin(u_time.x) * 0.5  + x ,a_position.y + y, a_position.zw);
-  gl_Position = vec4( p.xyz * u_scale.x, 1 );
-  // gl_Position = a_position;
+  // gl_Position = vec4( p.xyz * u_scale.x, 1 );
+  gl_Position = a_position;
 }
     
     `,
@@ -121,14 +122,17 @@ void main() {
 
     material.init(gl);
 
-    return {
-      geometry,
-      material,
-    }
+    const object3D = new Object3D();
+    const renderer = new Renderer();
+    renderer.geomrtry = geometry;
+    renderer.material = material;
+    object3D.renderer = renderer;
+
+    return object3D;
   }
 
 
-  const objects: Array<{ geometry: BufferGeometry; material: Material; }> = [];
+  const objects: Array<Object3D> = [];
   for (let i = 0; i < 5; i += 1) {
     objects.push(createObject(Math.random() * 2 - 1, Math.random() * 2 - 1));
   }
@@ -145,15 +149,17 @@ void main() {
 
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
+      const material = o.renderer?.material as Material;
+      const geometry = o.renderer?.geomrtry as BufferGeometry;
 
       //TODO do nothing if program or buffer is not changed
-      gl.useProgram(o.material.program);
-      o.material.uniforms.u_time.value[0] = timeSecond;
+      gl.useProgram(material.program);
+      material.uniforms.u_time.value[0] = timeSecond;
       // o.material.uniforms.u_scale.value[0] = Math.sin(timeSecond + i * Math.PI / objects.length);
       // o.material.uniforms.u_scale.value[0] = 1;
-      o.material.updateUniform(gl);
-      o.geometry.useBuffer(gl);
-      gl.drawArrays(gl.TRIANGLES, 0, o.geometry.vertexNum);
+      material.updateUniform(gl);
+      geometry.useBuffer(gl);
+      gl.drawArrays(gl.TRIANGLES, 0, geometry.vertexNum);
     }
     requestAnimationFrame(update);
   }
@@ -161,4 +167,4 @@ void main() {
   update();
 }
 
-paint();
+startPaint();
