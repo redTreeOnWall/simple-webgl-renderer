@@ -11,8 +11,10 @@ npm run buildExample
 python -m http.server
 ```
 3. open example/html/example.html in http server
-![](./res/example.jpg)
 
-![](./res/example2.jpg)
+![](./res/parser.jpg)
+
+![](./res/cube.jpg)
+
 
 
