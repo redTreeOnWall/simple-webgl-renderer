@@ -6,7 +6,7 @@ import { Texture } from "../src/core/Texture";
 import { Object3D } from "../src/core/Object";
 
 import { loadImage } from "../src/utils/ImageLoader";
-import {Renderer} from "../src/core/Renderer";
+import {RenderComponent} from "../src/core/Renderer";
 
 
 const startPaint = async () => {
@@ -123,7 +123,7 @@ void main() {
     material.init(gl);
 
     const object3D = new Object3D();
-    const renderer = new Renderer();
+    const renderer = new RenderComponent();
     renderer.geomrtry = geometry;
     renderer.material = material;
     object3D.renderer = renderer;
