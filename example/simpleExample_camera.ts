@@ -173,8 +173,8 @@ void main() {
       },
     };
 
-    geometry.initBuffer(gl, program);
-
+    geometry.initBuffer(gl);
+    geometry.setAttributes(gl, program);
 
     const cameraMatrix = Mat4.multiply(
       Mat4.translationMat4(10, 0, 10, new Mat4()),
@@ -246,7 +246,7 @@ void main() {
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
       const material = o.renderer?.material as Material;
-      const geometry = o.renderer?.geomrtry as BufferGeometry;
+      const geometry = o.renderer?.geometry as BufferGeometry;
       const transform = o.transform;
 
 

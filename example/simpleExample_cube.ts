@@ -228,7 +228,7 @@ void main() {
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
       const material = o.renderer?.material as Material;
-      const geometry = o.renderer?.geomrtry as BufferGeometry;
+      const geometry = o.renderer?.geometry as BufferGeometry;
       const transform = o.transform;
 
 

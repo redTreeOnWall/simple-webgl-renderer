@@ -14,4 +14,9 @@ export class Transform implements ITreeNode{
   constructor(object: AObject3D | null) {
     this.object = object;
   }
+
+  addChild(child: this) {
+    this.children.push(child);
+    child.parent = this;
+  }
 }

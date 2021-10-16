@@ -150,7 +150,7 @@ void main() {
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
       const material = o.renderer?.material as Material;
-      const geometry = o.renderer?.geomrtry as BufferGeometry;
+      const geometry = o.renderer?.geometry as BufferGeometry;
 
       //TODO do nothing if program or buffer is not changed
       gl.useProgram(material.program);
