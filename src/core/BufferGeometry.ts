@@ -70,10 +70,10 @@ export class BufferGeometry {
     }
   }
 
-  initBuffer(gl: WebGLRenderingContext, program: WebGLProgram) {
+  initBuffer(gl: WebGLRenderingContext) {
     this.createVBO(gl);
     this.syncBufferData(gl);
-    this.setAttributes(gl, program);
+    // this.setAttributes(gl, program);
   }
 
   useBuffer(gl: WebGLRenderingContext) {

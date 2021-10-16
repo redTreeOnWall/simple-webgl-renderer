@@ -4,7 +4,7 @@ import { BufferGeometry } from "../src/core/BufferGeometry";
 import { Material, UniformType } from "../src/core/Material";
 import { Object3D } from "../src/core/Object";
 
-import {Renderer} from "../src/core/Renderer";
+import {RenderComponent} from "../src/core/Renderer";
 import {Mat4} from "../src/math/Mat4";
 
 
@@ -196,7 +196,7 @@ void main() {
 
     material.init(gl);
     const object3D = new Object3D();
-    const renderer = new Renderer();
+    const renderer = new RenderComponent();
     renderer.geomrtry = geometry;
     renderer.material = material;
     object3D.renderer = renderer;
@@ -231,7 +231,7 @@ void main() {
     for (let i = 0; i < objects.length; i += 1) {
       const o = objects[i];
       const material = o.renderer?.material as Material;
-      const geometry = o.renderer?.geomrtry as BufferGeometry;
+      const geometry = o.renderer?.geometry as BufferGeometry;
       const transform = o.transform;
 
 

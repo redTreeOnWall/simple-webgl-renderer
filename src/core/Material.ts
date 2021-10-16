@@ -41,7 +41,6 @@ export class Material{
   }
 
   updateUniform(gl: WebGLRenderingContext){
-
     let textureUnit = 0;
 
     for( let key in this.uniforms) {
@@ -63,9 +62,6 @@ export class Material{
         gl.uniformMatrix4fv(uniform.location, false, uniform.value as Float32List);
       }
     }
-
-
-
   }
 
 }
