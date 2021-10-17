@@ -1,5 +1,5 @@
 import {BufferGeometry} from "./BufferGeometry";
-import {Material} from "./Material";
+import {Material} from "./Material/Material";
 
 export class RenderComponent {
   geometry: BufferGeometry;

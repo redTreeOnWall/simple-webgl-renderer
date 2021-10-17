@@ -2,8 +2,9 @@ import {Mat4} from "../math/Mat4";
 import {BufferGeometry} from "./BufferGeometry";
 import {Camera} from "./Camera";
 import {forEachTreeNode} from "./ITreeNode";
-import {Material, UniformType} from "./Material";
+import {Material, UniformType} from "./Material/Material";
 import {AObject3D} from "./Object";
+import {ShaderLib} from "./shaderlib/ShaderLib";
 import {Transform} from "./Transform";
 
 export class WebglRenderer {
@@ -58,13 +59,24 @@ export class WebglRenderer {
     
     const renderer = obj.renderer;
 
+
     this.updateState();
+
+
+    if(renderer.material.inited === false) {
+      renderer.material.init(this.gl);
+    }
+
+    if(renderer.geometry.inited === false) {
+      renderer.geometry.initBuffer(this.gl);
+    }
+
     this.gl.useProgram(renderer.material.program);
 
-    renderer.material.uniforms['u_matrix'].value = obj.transform.worldMat4.elements;
-    renderer.material.uniforms['u_projection'].value = camera.viewProjectionMatrix.elements;
-
-    renderer.geometry.setAttributes(this.gl, renderer.material.program);
+    renderer.material.uniforms[ShaderLib.uMatrix].value = obj.transform.worldMat4.elements;
+    renderer.material.uniforms[ShaderLib.uProjection].value = camera.viewProjectionMatrix.elements;
+  
+      renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
     this.updateUniformsOfMaterial(renderer.material);
     this.useBuffer(renderer.geometry);
     this.gl.drawArrays(this.gl.TRIANGLES, 0, renderer.geometry.vertexNum);

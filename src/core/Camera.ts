@@ -9,7 +9,7 @@ export class Camera extends AObject3D {
   constructor(
     aspect: number,
     fov = Math.PI / 3,
-    near = 0.001,
+    near = 0.1,
     far = 1000,
     name = 'camera',
   ) {
