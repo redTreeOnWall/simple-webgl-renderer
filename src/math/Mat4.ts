@@ -147,6 +147,15 @@ export class Mat4{
     return result;
   }
 
+  static scaleMat4(sx: number, sy: number, sz: number, result: Mat4) {
+    result.set(
+      sx, 0,  0,  0,
+      0, sy,  0,  0,
+      0,  0, sz,  0,
+      0,  0,  0,  1,
+    );
+  }
+
   static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number, result: Mat4) {
     result.set(
       2 / (right - left), 0, 0, 0,
@@ -261,6 +270,10 @@ export class Mat4{
     );
 
     return result;
+  }
+
+  static mat4PolarDecompose(origin: Mat4, result: Mat4) {
+  
   }
 }
 

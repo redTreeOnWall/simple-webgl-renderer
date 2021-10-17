@@ -22,6 +22,8 @@ export class BufferGeometry {
 
   vertexNum = -1
 
+  inited = false;
+
   createVBO(gl: WebGLRenderingContext) {
     for (let key in this.originData) {
       const oneOriginData = this.originData[key];
@@ -53,13 +55,13 @@ export class BufferGeometry {
       } else {
         if (this.vertexNum !== oneVertexNum) {
           console.error(`origin data is not correct:`)
-          console.error(this.originData);
         }
       }
     }
   }
 
   setAttributes(gl: WebGLRenderingContext, program: WebGLProgram) {
+    // TODO program dirty check
     for (let key in this.bufferData) {
       const buffer = this.bufferData[key];
       const location = gl.getAttribLocation(program, key);
@@ -71,6 +73,7 @@ export class BufferGeometry {
   }
 
   initBuffer(gl: WebGLRenderingContext) {
+    this.inited = true;
     this.createVBO(gl);
     this.syncBufferData(gl);
     // this.setAttributes(gl, program);

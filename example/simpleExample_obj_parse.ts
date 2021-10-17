@@ -1,10 +1,10 @@
 import { createProgramFromSource } from "../src/core/ShaderProgamUtils";
 import { BufferGeometry } from "../src/core/BufferGeometry";
 // import { awaitTime } from "../src/utils/timeUtils";
-import { Material, UniformType } from "../src/core/Material";
+import { Material, UniformType } from "../src/core/Material/Material";
 import { Object3D } from "../src/core/Object";
 
-import {RenderComponent} from "../src/core/Renderer";
+import {RenderComponent} from "../src/core/RenderComponent";
 import {Mat4} from "../src/math/Mat4";
 
 import {ObjParser} from "../src/parser/ObjParser";
@@ -19,8 +19,7 @@ const startPaint = async () => {
   const gl = canvas.getContext('webgl') as WebGLRenderingContext;
 
   const image1 = await loadImage('../res/module/women/tex/rp_mei_posed_001_dif_2k.jpg');
-  const texture1 = new Texture();
-  texture1.create(gl, image1);
+  const texture1 = Texture.create(gl, image1);
 
   const objContent = await (await fetch(`../res/module/women/women.obj?key=${Math.random()}`)).text();
   // const objContent = await (await fetch(`../res/module/box.obj?key=${Math.random()}`)).text();
@@ -121,7 +120,7 @@ void main() {
       },
     };
 
-    geometry.initBuffer(gl, program);
+    geometry.initBuffer(gl);
 
 
     const cameraMatrix = Mat4.translationMat4(0, +120, 100, new Mat4());
