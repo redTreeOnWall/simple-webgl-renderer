@@ -15,11 +15,11 @@ export class ObjFileStruct {
   normal: number[] = [];
   faces: number[] = [];
 }
-/////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * /////////////////////////////////////////////////////////////////////////////////////////
  * obj格式解析， 暂时只支持纯粹三角面的索引， 也不支持多个物体
+ * /////////////////////////////////////////////////////////////////////////////////////////
  */
-/////////////////////////////////////////////////////////////////////////////////////////
 export class ObjParser {
   static equalString ( smallString: string, bigString: string, startIndex: number) {
     for (let i =0 ; i< smallString.length; i++){
@@ -50,8 +50,7 @@ export class ObjParser {
       const value = content.substring(offset, index)
       const floatValue = parseFloat(value);
 
-      // pushToArray.push(floatValue);
-      pushToArray.push(value as unknown as number);
+      pushToArray.push(floatValue);
 
       offset = index + 1;
     }

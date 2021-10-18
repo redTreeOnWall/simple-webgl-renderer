@@ -18,6 +18,7 @@ export class Camera extends AObject3D {
   }
 
   updateViewProjectionMatrix() {
+    // TODO dirt check
     Mat4.inverse(this.transform.worldMat4, this.viewMatrix);
     Mat4.multiply(this.projection, this.viewMatrix, this.viewProjectionMatrix);
   }

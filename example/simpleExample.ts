@@ -124,7 +124,7 @@ const startPaint = async () => {
 
     Mat4.rotateYMat4(1 * deltT, v);
     Mat4.scaleMat4(2, 1, 1, v);
-    Mat4.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
+    // Mat4.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
     
     gl.clearColor(0.2, 0.2, 0.2, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
