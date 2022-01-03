@@ -1,4 +1,3 @@
-
 export const createShader = (gl: WebGLRenderingContext, type: number, source: string) => {
   const shader = gl.createShader(type) as WebGLShader;
   gl.shaderSource(shader, source);
@@ -36,6 +35,10 @@ export const createProgram = (
   gl.deleteProgram(program);
   return null;
 }
+
+// const name = 'test';
+const name1 = `test this is a `;
+const name = `test this is a ${name1}`;
 
 export const createProgramFromSource = (
   gl: WebGLRenderingContext,

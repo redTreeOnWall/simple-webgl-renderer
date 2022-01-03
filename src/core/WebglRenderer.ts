@@ -76,7 +76,7 @@ export class WebglRenderer {
     renderer.material.uniforms[ShaderLib.uMatrix].value = obj.transform.worldMat4.elements;
     renderer.material.uniforms[ShaderLib.uProjection].value = camera.viewProjectionMatrix.elements;
   
-      renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
+    renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
     this.updateUniformsOfMaterial(renderer.material);
     this.useBuffer(renderer.geometry);
     this.gl.drawArrays(this.gl.TRIANGLES, 0, renderer.geometry.vertexNum);
