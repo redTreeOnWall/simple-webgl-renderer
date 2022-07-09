@@ -1,6 +1,5 @@
-
-export class Mat4{
-  // TODO
+export class Mat4 {
+  // FIX_ME don't use array, use array buffer
   elements: Array<number> = [
     1,0,0,0,
     0,1,0,0,

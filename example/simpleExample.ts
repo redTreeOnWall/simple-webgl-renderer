@@ -1,6 +1,6 @@
 import {BufferGeometry} from "../src/core/BufferGeometry";
 import {UlitMaterial} from "../src/core/Material/UlitMaterial";
-import {AObject3D} from "../src/core/Object";
+import {Object3D} from "../src/core/Object3D";
 import {getBoxShape} from "../src/utils/shapeCreator"
 import {Mat4} from "../src/math/Mat4";
 import {WebglRenderer} from "../src/core/WebglRenderer";
@@ -8,13 +8,7 @@ import {Camera} from "../src/core/Camera";
 import {RenderComponent} from "../src/core/RenderComponent";
 import {loadImage} from "../src/utils/ImageLoader";
 import {ObjParser} from "../src/parser/ObjParser";
-
-class TestObject extends AObject3D {
-  update(): void {
-    // console.log(`updating: ${this.name}`);
-  }
-
-}
+import {Component} from "../src/core/Component";
 
 const startPaint = async () => {
 
@@ -56,10 +50,9 @@ const startPaint = async () => {
 
   const image = await loadImage('../res/module/women/tex/rp_mei_posed_001_dif_2k.jpg');
 
-  const material = new UlitMaterial([1,1, 1, 1], image);
+  const material = new UlitMaterial([1, 1, 1, 1], image);
 
   const geometry = new BufferGeometry();
-  const box = getBoxShape();
   geometry.originData = {
     a_position: {
       size: 3,
@@ -71,41 +64,79 @@ const startPaint = async () => {
     }
   };
 
-  const rootObj = new TestObject('root');
-  const root = rootObj.transform;
 
-  const child1 = new TestObject('child1');
+  const boxShape = getBoxShape();
 
-  const child2 = new TestObject('child2');
-  child1.transform.addChild(child2.transform);
+  const box = new BufferGeometry();
 
-  Mat4.translationMat4(100, 0, 0, child2.transform.localMat4);
+  box.originData = {
+    a_position: {
+      size: 3,
+      data: boxShape.position,
+    },
+    a_uv: {
+      size: 3,
+      data: boxShape.uv,
+    }
+  }
+
+  const rootObj = Object3D.create();
+
+  class RootCom extends Component {
+    update() {
+    }
+  }
+
+  rootObj.addComponent(RootCom);
+
+  const child1 = Object3D.create();
+
+  const child2 = Object3D.create();
+
+  const child3 = Object3D.create();
+
+  child2.parent = child1;
+
+  child3.parent = child2;
+
+  Mat4.translationMat4(100, 0, 0, child2.transform);
 
   child1.renderer = new RenderComponent(
     geometry,
     material,
   );
 
-  child2.renderer = new RenderComponent(
+  child3.renderer = new RenderComponent(
     geometry,
     material,
   );
 
-  root.addChild(child1.transform);
+  child2.renderer = new RenderComponent(
+    box,
+    material,
+  );
+
+  child1.parent = rootObj;
 
   let timeSecond = 0;
   const frameTime = Math.floor(1000 / 60);
 
   const renderer = new WebglRenderer(gl);
-  const camera = new Camera(gl.canvas.width / gl.canvas.height);
-  root.addChild(camera.transform);
-  camera.transform.localMat4 = Mat4.translationMat4(0, 150, 300, camera.transform.localMat4);
+  
+  const cameraObject = Object3D.create();
 
+  const camera =cameraObject.addComponent(Camera);
+
+  camera.setParams(gl.canvas.width / gl.canvas.height);
+
+  camera.getObject3D().parent = rootObj;
+
+  camera.getObject3D().transform = Mat4.translationMat4(0, 150, 300, camera.getObject3D().transform);
 
   gl.enable(gl.CULL_FACE);
   gl.enable(gl.DEPTH_TEST);
 
-  renderer.renderObjectTree(root, camera)
+  renderer.renderObjectTree(rootObj, camera)
 
   const v = new Mat4();
   const v2 = new Mat4();
@@ -120,16 +151,25 @@ const startPaint = async () => {
     // Mat4.rotateXMat4(1.3 * deltT, v2);
     // Mat4.multiply(v, v2, v);
 
-    Mat4.multiply(v, child1.transform.localMat4, child1.transform.localMat4);
+    Mat4.multiply(v, child2.transform, child2.transform);
 
-    Mat4.rotateYMat4(1 * deltT, v);
-    Mat4.scaleMat4(2, 1, 1, v);
-    // Mat4.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
+    Mat4.rotateYMat4(5 * deltT, v);
+    Mat4.multiply(v, child3.transform, child3.transform);
+
+    const x = 50 * Math.sin(timeSecond)
+
+    Mat4.translationMat4(x, 0, 0, v);
+
+    rootObj.transform.elements[12] = x;
+
+    // Mat4.multiply(v, child1.transform, child1.transform);
+
+    // Mat3.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
     
     gl.clearColor(0.2, 0.2, 0.2, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    renderer.renderObjectTree(root, camera)
+    renderer.renderObjectTree(rootObj, camera)
 
     requestAnimationFrame(update);
     // setTimeout(update, 500)

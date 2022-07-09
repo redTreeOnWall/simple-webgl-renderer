@@ -3,9 +3,8 @@ import {BufferGeometry} from "./BufferGeometry";
 import {Camera} from "./Camera";
 import {forEachTreeNode} from "./ITreeNode";
 import {Material, UniformType} from "./Material/Material";
-import {AObject3D} from "./Object";
+import {Object3D} from "./Object3D";
 import {ShaderLib} from "./shaderlib/ShaderLib";
-import {Transform} from "./Transform";
 
 export class WebglRenderer {
   gl: WebGLRenderingContext;
@@ -14,34 +13,35 @@ export class WebglRenderer {
     this.gl = gl; 
   }
 
-  renderObjectTree(root: Transform, camera: Camera) {
+  renderObjectTree(root: Object3D, camera: Camera) {
     this.clear();
 
+    const list: Object3D[] = [];
+
+
     forEachTreeNode(root, (node) => {
+      list.push(node);
+    });
+
+    list.forEach((node) => {
       // update matrix
       if (node.parent === null) {
-        Mat4.setFromArray(node.worldMat4, node.localMat4.elements);
+        Mat4.setFromArray(node.cachedWorldTransform, node.transform.elements);
       } else {
-        Mat4.multiply(node.parent.worldMat4, node.localMat4, node.worldMat4);
+        Mat4.multiply(node.parent.cachedWorldTransform, node.transform, node.cachedWorldTransform);
       }
     });
 
-    forEachTreeNode(root, (node) => {
-      if(node.object !== null) {
-        node.object.update();
-      }
+    list.forEach((node) => {
+      node.update();
     });
-
 
     // render
     camera.updateViewProjectionMatrix();
 
-    forEachTreeNode(root, (node) => {
-      if(node.object !== null) {
-        this.renderOneObject(node.object, camera);
-      }
+    list.forEach((node) => {
+      this.renderOneObject(node, camera);
     });
-
   }
 
   clear() {
@@ -52,16 +52,14 @@ export class WebglRenderer {
     // TODO
   }
 
-  renderOneObject (obj: AObject3D, camera: Camera) {
-    if (obj.renderer === undefined) {
+  renderOneObject (obj: Object3D, camera: Camera) {
+    if (obj.renderer === null) {
       return;
     }
     
     const renderer = obj.renderer;
 
-
     this.updateState();
-
 
     if(renderer.material.inited === false) {
       renderer.material.init(this.gl);
@@ -73,10 +71,10 @@ export class WebglRenderer {
 
     this.gl.useProgram(renderer.material.program);
 
-    renderer.material.uniforms[ShaderLib.uMatrix].value = obj.transform.worldMat4.elements;
+    renderer.material.uniforms[ShaderLib.uMatrix].value = obj.cachedWorldTransform.elements;
     renderer.material.uniforms[ShaderLib.uProjection].value = camera.viewProjectionMatrix.elements;
   
-      renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
+    renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
     this.updateUniformsOfMaterial(renderer.material);
     this.useBuffer(renderer.geometry);
     this.gl.drawArrays(this.gl.TRIANGLES, 0, renderer.geometry.vertexNum);
