@@ -154,6 +154,8 @@ export class Mat4{
       0,  0, sz,  0,
       0,  0,  0,  1,
     );
+
+    return result;
   }
 
   static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number, result: Mat4) {
