@@ -1,110 +1,145 @@
 import {BufferGeometry} from "../src/core/BufferGeometry";
 import {UlitMaterial} from "../src/core/Material/UlitMaterial";
-import {AObject3D} from "../src/core/Object";
-import {getPlaneShape} from "../src/utils/shapeCreator"
+import {Object3D} from "../src/core/Object3D";
+import {getBoxShape} from "../src/utils/shapeCreator"
 import {Mat4} from "../src/math/Mat4";
-import {Vec3} from "../src/math/Vec3";
 import {WebglRenderer} from "../src/core/WebglRenderer";
 import {Camera} from "../src/core/Camera";
 import {RenderComponent} from "../src/core/RenderComponent";
 import {loadImage} from "../src/utils/ImageLoader";
 import {ObjParser} from "../src/parser/ObjParser";
-
-class RainDrop extends AObject3D {
-  speed: number;
-  size: number;
-  position: Vec3;
-
-  constructor(name: string = 'new rain') {
-    super(name);
-
-    this.speed = Math.random() * 1 + 1;
-
-    this.size = 1;
-
-    this.position = new Vec3();
-
-    Mat4.scaleMat4(1, 10, 1, this.tempMatrix);
-
-    Mat4.multiply(this.tempMatrix, this.transform.localMat4, this.transform.localMat4);
-
-    this.rebirth();
-  }
-
-  rebirth() {
-    const size = 10;
-    this.position.set( 
-      Math.random() * size - size * 0.5,
-      Math.random() * size - size * 0.5 + size,
-      Math.random() * size - size * 0.5,
-    );
-  }
-
-
-  tempMatrix = new Mat4();
-  update(): void {
-    // console.log(`updating: ${this.name}`);
-    const deltTime = 1000 / 60;
-    this.position.y = this.position.y - deltTime * this.speed;
-
-    if (this.position.y < this.size * 0.5) {
-      this.rebirth();
-    }
-
-    
-  }
-}
+import {Component} from "../src/core/Component";
 
 const startPaint = async () => {
 
-  const geometry = new BufferGeometry();
-  const plane = getPlaneShape();
-  geometry.originData = {
-    a_position: {
-      size: 3,
-      data: plane.position,
-    },
-    a_uv: {
-      size: 3,
-      data: plane.uv,
+  const objContent = await (await fetch(`../res/module/women/women.obj?key=${Math.random()}`)).text();
+
+  const obj = ObjParser.parseObj(objContent);
+  console.log(obj);
+
+  const positionData: number[] = [];
+  const texcoordData: number[] = [];
+  const normalData: number[] = [];
+  
+  const faceCount = obj.faces.length / 9;
+
+  for (let f = 0; f < faceCount; f ++) {
+    for (let p = 0; p < 3; p++) {
+      const offset = f * 9 + p * 3;
+      const positionIndex = obj.faces[offset + 0] - 1;
+      const texcoordIndex = obj.faces[offset + 1] - 1;
+      const normalIndex = obj.faces[offset + 2] - 1;
+
+      for (let v = 0; v < 3; v++) {
+        positionData.push(obj.verts[positionIndex * 3 + v]);
+      }
+
+      for (let v = 0; v < 3; v++) {
+        normalData.push(obj.normal[normalIndex * 3 + v]);
+      }
+
+      for (let v = 0; v < 3; v++) {
+        texcoordData.push(obj.texcoord[texcoordIndex * 3 + v]);
+      }
     }
-  };
-
-  const rootObj = new RainDrop('root');
-  const root = rootObj.transform;
-
+  }
 
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
   const gl = canvas.getContext('webgl') as WebGLRenderingContext;
 
-  const material = new UlitMaterial([1, 1, 1, 1]);
+  const image = await loadImage('../res/module/women/tex/rp_mei_posed_001_dif_2k.jpg');
 
-  // add all children
+  const material = new UlitMaterial([1, 1, 1, 1], image);
 
-  const child1 = new RainDrop('child1');
+  const geometry = new BufferGeometry();
+  geometry.originData = {
+    a_position: {
+      size: 3,
+      data: positionData,
+    },
+    a_uv: {
+      size: 3,
+      data: texcoordData,
+    }
+  };
+
+
+  const boxShape = getBoxShape();
+
+  const box = new BufferGeometry();
+
+  box.originData = {
+    a_position: {
+      size: 3,
+      data: boxShape.position,
+    },
+    a_uv: {
+      size: 3,
+      data: boxShape.uv,
+    }
+  }
+
+  const rootObj = Object3D.create();
+
+  class RootCom extends Component {
+    update() {
+    }
+  }
+
+  rootObj.addComponent(RootCom);
+
+  const child1 = Object3D.create();
+
+  const child2 = Object3D.create();
+
+  const child3 = Object3D.create();
+
+  child2.parent = child1;
+
+  child3.parent = child2;
+
+  Mat4.translationMat4(100, 0, 0, child2.transform);
 
   child1.renderer = new RenderComponent(
     geometry,
     material,
   );
 
-  root.addChild(child1.transform);
+  child3.renderer = new RenderComponent(
+    geometry,
+    material,
+  );
+
+  child2.renderer = new RenderComponent(
+    box,
+    material,
+  );
+
+  child1.parent = rootObj;
 
   let timeSecond = 0;
   const frameTime = Math.floor(1000 / 60);
 
   const renderer = new WebglRenderer(gl);
-  const camera = new Camera(gl.canvas.width / gl.canvas.height);
-  root.addChild(camera.transform);
-  camera.transform.localMat4 = Mat4.translationMat4(0, 0, 20, camera.transform.localMat4);
+  
+  const cameraObject = Object3D.create();
+
+  const camera =cameraObject.addComponent(Camera);
+
+  camera.setParams(gl.canvas.width / gl.canvas.height);
+
+  camera.getObject3D().parent = rootObj;
+
+  camera.getObject3D().transform = Mat4.translationMat4(0, 150, 300, camera.getObject3D().transform);
 
   gl.enable(gl.CULL_FACE);
   gl.enable(gl.DEPTH_TEST);
 
-  renderer.renderObjectTree(root, camera)
+  renderer.renderObjectTree(rootObj, camera)
 
   const v = new Mat4();
+  const v2 = new Mat4();
 
   const update = () => {
 
@@ -112,16 +147,29 @@ const startPaint = async () => {
 
     const deltT = frameTime / 1000;
 
-    // Mat4.rotateYMat4(0.5 * deltT, v);
-    // Mat4.multiply(v, child1.transform.localMat4, child1.transform.localMat4);
+    Mat4.rotateYMat4(0.5 * deltT, v);
+    // Mat4.rotateXMat4(1.3 * deltT, v2);
+    // Mat4.multiply(v, v2, v);
 
-    Mat4.rotateYMat4(1 * deltT, v);
-    // Mat4.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
+    Mat4.multiply(v, child2.transform, child2.transform);
 
+    Mat4.rotateYMat4(5 * deltT, v);
+    Mat4.multiply(v, child3.transform, child3.transform);
+
+    const x = 50 * Math.sin(timeSecond)
+
+    Mat4.translationMat4(x, 0, 0, v);
+
+    rootObj.transform.elements[12] = x;
+
+    // Mat4.multiply(v, child1.transform, child1.transform);
+
+    // Mat3.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
+    
     gl.clearColor(0.2, 0.2, 0.2, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    renderer.renderObjectTree(root, camera)
+    renderer.renderObjectTree(rootObj, camera)
 
     requestAnimationFrame(update);
     // setTimeout(update, 500)

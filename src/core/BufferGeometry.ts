@@ -12,7 +12,6 @@ interface BufferData {
     attributeLocation: number,
     vertexBuffer: WebGLBuffer | null,
   }
-
 }
 
 export class BufferGeometry {

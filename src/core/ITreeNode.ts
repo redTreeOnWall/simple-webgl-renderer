@@ -1,23 +1,23 @@
 import {LinkData, LinkedList} from "../utils/LinkedList";
 
 export interface ITreeNode {
-  children: this[];
-  parent: this | null;
+  children: ITreeNode[];
+  parent: ITreeNode | null;
 }
 
 export const forEachTreeNode= <T extends ITreeNode>(root: T, func: (node: T) => void) => {
-  const queue: LinkedList<T> = new LinkedList();
-  queue.addTail(root);
+  const stack: T[] = [];
+  stack.push(root);
 
-  while (!queue.isEmpty()) {
-    const head = (queue.removeHead() as LinkData<T>).data as T;
+  while (stack.length > 0) {
+    const top = stack.pop() as T;
 
     // TODO remove out of loop
-    func(head);
+    func(top);
 
-    for(let i = 0; i< head.children.length; i++) {
-      const child = head.children[i];
-      queue.addTail(child);
+    for(let i = top.children.length - 1; i >= 0; i -= 1) {
+      const child = top.children[i] as T;
+      stack.push(child);
     }
   }
 

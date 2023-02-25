@@ -41,7 +41,7 @@ export class ObjParser {
     return str.length;
   }
 
-  static readTheeNumber(i: number, content: string, pushToArray: number[]) {
+  static readThreeNumber(i: number, content: string, pushToArray: number[]) {
     let offset = i;
     for (let j = 0; j < 3; j++) {
 
@@ -101,19 +101,19 @@ export class ObjParser {
       }
 
       if (lineType === LineType.vertx) {
-        const lineEndIndex = this.readTheeNumber(i, objContent, struct.verts);
+        const lineEndIndex = this.readThreeNumber(i, objContent, struct.verts);
         i = lineEndIndex;
         continue;
       }
 
       if (lineType === LineType.normal) {
-        const lineEndIndex = this.readTheeNumber(i, objContent, struct.normal);
+        const lineEndIndex = this.readThreeNumber(i, objContent, struct.normal);
         i = lineEndIndex;
         continue;
       }
 
       if (lineType === LineType.texcoord) {
-        const lineEndIndex = this.readTheeNumber(i, objContent, struct.texcoord);
+        const lineEndIndex = this.readThreeNumber(i, objContent, struct.texcoord);
         i = lineEndIndex;
         continue;
       }

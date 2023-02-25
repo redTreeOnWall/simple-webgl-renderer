@@ -28,6 +28,7 @@ export class Material{
 
   fragShader: string;
 
+  // TODO change to array
   uniforms: {[key: string]: Uniform} = {};
 
   program: WebGLProgram | null = null;
