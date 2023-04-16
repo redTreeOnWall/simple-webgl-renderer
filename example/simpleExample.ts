@@ -1,5 +1,5 @@
 import {BufferGeometry} from "../src/core/BufferGeometry";
-import {UlitMaterial} from "../src/core/Material/UlitMaterial";
+import {SimpleLightMaterial} from "../src/core/Material/SimpleLightMaterial";
 import {Object3D} from "../src/core/Object3D";
 import {getBoxShape} from "../src/utils/shapeCreator"
 import {Mat4} from "../src/math/Mat4";
@@ -20,10 +20,10 @@ const startPaint = async () => {
   const positionData: number[] = [];
   const texcoordData: number[] = [];
   const normalData: number[] = [];
-  
+
   const faceCount = obj.faces.length / 9;
 
-  for (let f = 0; f < faceCount; f ++) {
+  for (let f = 0; f < faceCount; f++) {
     for (let p = 0; p < 3; p++) {
       const offset = f * 9 + p * 3;
       const positionIndex = obj.faces[offset + 0] - 1;
@@ -45,12 +45,14 @@ const startPaint = async () => {
   }
 
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-
-  const gl = canvas.getContext('webgl') as WebGLRenderingContext;
+  canvas.width = 600;
+  canvas.height = 500;
 
   const image = await loadImage('../res/module/women/tex/rp_mei_posed_001_dif_2k.jpg');
 
-  const material = new UlitMaterial([1, 1, 1, 1], image);
+  const matCapImage = await loadImage('../res/image/matcapTest.png');
+
+  const material = new SimpleLightMaterial([1, 1, 1, 1], matCapImage);
 
   const geometry = new BufferGeometry();
   geometry.originData = {
@@ -61,6 +63,10 @@ const startPaint = async () => {
     a_uv: {
       size: 3,
       data: texcoordData,
+    },
+    a_normal: {
+      size: 3,
+      data: normalData,
     }
   };
 
@@ -75,7 +81,7 @@ const startPaint = async () => {
       data: boxShape.position,
     },
     a_uv: {
-      size: 3,
+      size: 2,
       data: boxShape.uv,
     }
   }
@@ -99,7 +105,7 @@ const startPaint = async () => {
 
   child3.parent = child2;
 
-  Mat4.translationMat4(100, 0, 0, child2.transform);
+  Mat4.translationMat4(100, 0, 0, child2.getTransform());
 
   child1.renderer = new RenderComponent(
     geometry,
@@ -121,20 +127,18 @@ const startPaint = async () => {
   let timeSecond = 0;
   const frameTime = Math.floor(1000 / 60);
 
-  const renderer = new WebglRenderer(gl);
-  
+  const renderer = new WebglRenderer(canvas);
+
   const cameraObject = Object3D.create();
 
-  const camera =cameraObject.addComponent(Camera);
+  const camera = cameraObject.addComponent(Camera);
 
-  camera.setParams(gl.canvas.width / gl.canvas.height);
+  camera.setParams(renderer.gl.canvas.width / renderer.gl.canvas.height);
 
   camera.getObject3D().parent = rootObj;
-
-  camera.getObject3D().transform = Mat4.translationMat4(0, 150, 300, camera.getObject3D().transform);
-
-  gl.enable(gl.CULL_FACE);
-  gl.enable(gl.DEPTH_TEST);
+  camera.getObject3D().setTransform(
+    (Mat4.translationMat4(0, 150, 300, camera.getObject3D().getTransform()))
+  );
 
   renderer.renderObjectTree(rootObj, camera)
 
@@ -142,7 +146,6 @@ const startPaint = async () => {
   const v2 = new Mat4();
 
   const update = () => {
-
     timeSecond = timeSecond + frameTime / 1000;
 
     const deltT = frameTime / 1000;
@@ -151,27 +154,26 @@ const startPaint = async () => {
     // Mat4.rotateXMat4(1.3 * deltT, v2);
     // Mat4.multiply(v, v2, v);
 
-    Mat4.multiply(v, child2.transform, child2.transform);
+    Mat4.multiply(v, child2.getTransform(), child2.getTransform());
 
     Mat4.rotateYMat4(5 * deltT, v);
-    Mat4.multiply(v, child3.transform, child3.transform);
+    Mat4.multiply(v, child3.getTransform(), child3.getTransform());
 
     const x = 50 * Math.sin(timeSecond)
 
     Mat4.translationMat4(x, 0, 0, v);
 
-    rootObj.transform.elements[12] = x;
+    const translateMat4 = Mat4.copyAtoB(rootObj.getTransform(), new Mat4());
+    translateMat4.elements[12] = x;
+    rootObj.setTransform(translateMat4)
 
     // Mat4.multiply(v, child1.transform, child1.transform);
 
     // Mat3.multiply( child2.transform.localMat4, v, child2.transform.localMat4);
-    
-    gl.clearColor(0.2, 0.2, 0.2, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     renderer.renderObjectTree(rootObj, camera)
 
-    requestAnimationFrame(update);
+    // requestAnimationFrame(update);
     // setTimeout(update, 500)
   }
 

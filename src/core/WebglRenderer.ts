@@ -7,10 +7,36 @@ import {Object3D} from "./Object3D";
 import {ShaderLib} from "./shaderlib/ShaderLib";
 
 export class WebglRenderer {
-  gl: WebGLRenderingContext;
+  private _gl: WebGLRenderingContext;
 
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl; 
+  get gl() {
+    return this._gl;
+  }
+
+  private _canvas: HTMLCanvasElement;
+
+  get canvas() {
+    return this._canvas;
+  }
+
+  constructor(canvas: HTMLCanvasElement) {
+    this._canvas = canvas;
+    const gl = canvas.getContext("webgl");
+    if (!gl) {
+      throw new RendererError("Can not get webgl context from canvas!");
+    }
+    this._gl = gl;
+    this.canvasSizeChanged();
+    this.setDefaultProperties();
+  }
+
+  setDefaultProperties() {
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.enable(this.gl.DEPTH_TEST);
+  }
+
+  canvasSizeChanged() {
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 
   renderObjectTree(root: Object3D, camera: Camera) {
@@ -21,15 +47,6 @@ export class WebglRenderer {
 
     forEachTreeNode(root, (node) => {
       list.push(node);
-    });
-
-    list.forEach((node) => {
-      // update matrix
-      if (node.parent === null) {
-        Mat4.setFromArray(node.cachedWorldTransform, node.transform.elements);
-      } else {
-        Mat4.multiply(node.parent.cachedWorldTransform, node.transform, node.cachedWorldTransform);
-      }
     });
 
     list.forEach((node) => {
@@ -45,35 +62,45 @@ export class WebglRenderer {
   }
 
   clear() {
-
+    this.gl.clearColor(0.2, 0.2, 0.2, 1);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
   updateState() {
     // TODO
   }
 
-  renderOneObject (obj: Object3D, camera: Camera) {
+  private currentProgram: WebGLProgram | null = null;
+  renderOneObject(obj: Object3D, camera: Camera) {
     if (obj.renderer === null) {
       return;
     }
-    
+
     const renderer = obj.renderer;
 
     this.updateState();
 
-    if(renderer.material.inited === false) {
+    if (renderer.material.inited === false) {
       renderer.material.init(this.gl);
     }
 
-    if(renderer.geometry.inited === false) {
+    if (renderer.geometry.inited === false) {
       renderer.geometry.initBuffer(this.gl);
     }
 
-    this.gl.useProgram(renderer.material.program);
+    if (this.currentProgram !== renderer.material.program) {
+      this.gl.useProgram(renderer.material.program);
+      this.currentProgram = renderer.material.program;
+    }
 
-    renderer.material.uniforms[ShaderLib.uMatrix].value = obj.cachedWorldTransform.elements;
+    renderer.material.uniforms[ShaderLib.uMatrix].value = obj.getGlobaleTransform().elements;
     renderer.material.uniforms[ShaderLib.uProjection].value = camera.viewProjectionMatrix.elements;
-  
+
+    const cameraPosition = renderer.material.uniforms[ShaderLib.uProjection];
+    if (cameraPosition) {
+      cameraPosition.value = camera.viewProjectionMatrix.elements;
+    }
+
     renderer.geometry.setAttributes(this.gl, renderer.material.program as WebGLProgram);
     this.updateUniformsOfMaterial(renderer.material);
     this.useBuffer(renderer.geometry);
@@ -83,16 +110,16 @@ export class WebglRenderer {
   updateUniformsOfMaterial(material: Material) {
     let textureUnit = 0;
 
-    for( let key in material.uniforms) {
+    for (let key in material.uniforms) {
       const uniform = material.uniforms[key];
 
       // TODO change to array map
 
       // dirty check
-      if(uniform.type === UniformType.vec4) {
+      if (uniform.type === UniformType.vec4) {
         this.gl.uniform4fv(uniform.location, uniform.value as Float32List);
       }
-      else if(uniform.type === UniformType.texture){
+      else if (uniform.type === UniformType.texture) {
         this.gl.uniform1i(uniform.location, textureUnit);
         this.gl.activeTexture(this.gl.TEXTURE0 + textureUnit);
         // TODO type check

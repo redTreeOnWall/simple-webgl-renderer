@@ -53,7 +53,7 @@ export class BufferGeometry {
         this.vertexNum = oneVertexNum;
       } else {
         if (this.vertexNum !== oneVertexNum) {
-          console.error(`origin data is not correct:`)
+          console.error(`origin data is not correct?`)
         }
       }
     }

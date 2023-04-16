@@ -32,6 +32,7 @@ export class Mat4 {
     this.elements[13] = e31;
     this.elements[14] = e32;
     this.elements[15] = e33;
+    return this;
   }
 
   static multiply(a: Mat4, b: Mat4, outMat: Mat4) {
@@ -275,6 +276,13 @@ export class Mat4 {
 
   static mat4PolarDecompose(origin: Mat4, result: Mat4) {
   
+  }
+
+  static copyAtoB(a: Mat4, b: Mat4) {
+    a.elements.forEach((e, i) => {
+      b.elements[i] = a.elements[i];
+    });
+    return b;
   }
 }
 

@@ -23,7 +23,7 @@ export class Camera extends Component {
 
   updateViewProjectionMatrix() {
     // TODO dirt check
-    Mat4.inverse(this.getObject3D().cachedWorldTransform, this.viewMatrix);
+    Mat4.inverse(this.getObject3D().getGlobaleTransform(), this.viewMatrix);
     Mat4.multiply(this.projection, this.viewMatrix, this.viewProjectionMatrix);
   }
 

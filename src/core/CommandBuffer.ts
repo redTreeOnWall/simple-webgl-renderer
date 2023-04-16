@@ -1,6 +1,11 @@
+export enum CommandType {
+}
 
+export interface RenderingCommandBuffer {
+  exec: () => void;
+}
 
-// soft CommandBuffer
-export class CommandBuffer {
+// CommandBuffer
+export class BaseCommandBuffer {
   // TODO
 }

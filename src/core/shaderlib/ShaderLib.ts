@@ -3,12 +3,14 @@ export class ShaderLib {
   static readonly aPosition = 'a_position';
   static readonly uMatrix = 'u_matrix';
   static readonly uProjection = 'u_projection';
+  static readonly uCameraPosition = 'u_camera_position';
 
   static vertxShaderTemplateBasic(vertxProperties: string = '', vertxMain: string = '') {
     return `
       attribute vec4 a_position;
       uniform mat4 u_matrix;
       uniform mat4 u_projection;
+      uniform mat4 u_camera_position;
 
       ${vertxProperties}
 

@@ -1,0 +1,1 @@
+class RendererError extends Error{}
